@@ -21,6 +21,7 @@ namespace TheFirstVisitorMainPATH
         List<GameObject> allItems = new List<GameObject>();
 
         GameObject player;
+        GameObject tipText;
 
         GUIStyle modifyisEnabled = new GUIStyle();
         GUIStyle modifyisDisabled = new GUIStyle();
@@ -45,7 +46,7 @@ namespace TheFirstVisitorMainPATH
         string[] windowSize = new string[] { "2560x1440", "1920x1080", "1600x900", "1280x720", "800x600"};
 
         bool isOnGame;
-        
+
         bool runGetAllitems;
         bool teleportItems;
         bool pickupAllItems;
@@ -105,7 +106,7 @@ namespace TheFirstVisitorMainPATH
         }
 
         private void RemoveMosaic()
-        {
+            {
             Transform[] playerAllGameObject = player.GetComponentsInChildren<Transform>();
 
             foreach (Transform child in playerAllGameObject)
@@ -115,15 +116,15 @@ namespace TheFirstVisitorMainPATH
                     if (child.GetComponent<MeshRenderer>())
                     {
                         Destroy(child.GetComponent<MeshRenderer>());
-                    }
+            }
                 }
 
                 if (child.name == "モザイク")
-                {
+            {
                     if (child.GetComponent<SkinnedMeshRenderer>())
                     {
                         Destroy(child.GetComponent<SkinnedMeshRenderer>());
-                    }
+            }
                 }
             }
 
@@ -145,23 +146,23 @@ namespace TheFirstVisitorMainPATH
             {
                 modifyMenuBtn = !modifyMenuBtn;
             }
-
+            
             //遍历已存储的对象，进行交互(触发交互)
             if (Input.GetKeyDown(surveyAllItemsKey))        
             {
                 teleportItems = !teleportItems;
                 StartCoroutine(Move_Pickup());
-            }
+            } 
 
             //遍历所有对象，并找到可拾取的物品(拾取物品)
             if (Input.GetKeyDown(pickupKey))        
             {
                 pickupAllItems = !pickupAllItems;
                 StartCoroutine(PickupItems_Ground());
-            }
+        }
 
             if (Input.GetKeyDown(closeModifierKey))
-            {
+        {
                 Destroy(this);
             }
 
@@ -170,13 +171,13 @@ namespace TheFirstVisitorMainPATH
                 godMode = !godMode;
             }
             if (godMode && isOnGame && player != null)
-            {
+                {
                 YurineController playerController = player.GetComponentInChildren<YurineController>();
 
                 playerController.hp = playerController.maxHp;
                 playerController.stamina = playerController.maxStamina;
+                }
             }
-        }
 
         //聚怪 Orc_
 
@@ -297,11 +298,11 @@ namespace TheFirstVisitorMainPATH
             _tipBtnText = "载入中......";
 
             while (true)
-            {
+        {
                 Scene sceneState = SceneManager.GetActiveScene();
 
                 if (sceneState.name == AllGameScene.PreTitle.ToString() || sceneState.name == AllGameScene.Title.ToString())
-                {
+            {
                     _tipBtnText = "等待进入游戏.....";
                     isOnGame = false;
                 }
@@ -324,7 +325,7 @@ namespace TheFirstVisitorMainPATH
         }
 
         private void GetAllChestPos()
-        {
+                {
             allChest.Clear();
             allItems.Clear();
 
@@ -339,7 +340,7 @@ namespace TheFirstVisitorMainPATH
                         if (obj.transform.Find("Child").gameObject.transform.Find("ChestLv1Glow").gameObject.activeSelf)
                         {
                             allItems.Add(obj);
-                        }
+                }
                     }
                     else if (obj.name.StartsWith("BaseLootBox"))
                     {
@@ -350,21 +351,21 @@ namespace TheFirstVisitorMainPATH
                     }
                 }
             }
-            else
-            {
+                else
+                {
                 _tipText = "未找到任何调查点或物品.";
                 hastipText = true;
             }
 
             if (allItems.Count < 1 && allChest.Count < 1)
-            {
+                    {
                 _tipText = "未找到任何调查点或物品.";
                 hastipText = true;
-            }
+                    }
         }
 
         private void OnGUI()
-        {
+                    {
             //绘制提示文本
             GUILayout.BeginArea(new Rect(40, 70, 200, 100));
             {
@@ -412,10 +413,10 @@ namespace TheFirstVisitorMainPATH
             QualitySettings.vSyncCount = vSync_ ? 1 : 0;
 
             if (GUILayout.Button("确认修改") && !string.IsNullOrEmpty(maxFps))
-            {
+                        {
                 Application.targetFrameRate = Int32.Parse(maxFps);
             }
-        }
+                        }
 
         private void AddBuffer(int winId)
         {
@@ -435,9 +436,9 @@ namespace TheFirstVisitorMainPATH
                     }
                     index++;
                 }
-            }
+                    }
             GUILayout.EndScrollView();
-        }
+                }
 
         private void ChangeWindow(int winId)
         {
@@ -454,7 +455,7 @@ namespace TheFirstVisitorMainPATH
                     Screen.SetResolution(screenResWidth, screenResHeight, fullScreen);
                 }
             }  
-        }
+            }
 
         private void tipMenu(int winId)
         {
@@ -463,7 +464,7 @@ namespace TheFirstVisitorMainPATH
             tipStyle.fontSize = 14;
             tipStyle.normal.textColor = Color.green;
             tipStyle.alignment = TextAnchor.UpperCenter;
-
+            
             GUILayout.Label(_tipText, tipStyle);
             GUILayout.Label("FPS: " + Math.Floor(1.0f / Time.deltaTime) , tipStyle);
         }
@@ -480,7 +481,7 @@ namespace TheFirstVisitorMainPATH
             GUILayout.BeginArea(new Rect(10, 20, 130, 280));
             {
                 if (GUILayout.Button("窗口大小"))
-                {
+            {
                     changeWindowSize = !changeWindowSize;
                 }
 
@@ -494,14 +495,14 @@ namespace TheFirstVisitorMainPATH
                     if (GUILayout.Button("初始化物资"))
                     {
                         if (Move_Pickup().MoveNext())
-                        {
+                {
                             _tipText = "正在运行,请稍后重试";
                             hastipText = true;
                         }
 
                         runGetAllitems = true;
                         GetAllChestPos();
-                    }
+                }
 
                     GUILayout.Label("传送物资 [F4]", teleportItems ? modifyisEnabled : modifyisDisabled);
                     GUILayout.Label("一键拾取 [F5]", pickupAllItems ? modifyisEnabled : modifyisDisabled);
@@ -510,16 +511,16 @@ namespace TheFirstVisitorMainPATH
                     if (GUILayout.Button("添加经验") && !string.IsNullOrEmpty(addExp))
                     {
                         player.GetComponentInChildren<YurineController>().exp += Int32.Parse(addExp);
-                    }
+            }
                     addExp = GUILayout.TextField(addExp);
 
                     if (GUILayout.Button("添加BUFF"))
-                    {
+            {
                         addBuffWindow = !addBuffWindow;
                     }
-                }
-                else
-                {
+            }
+            else
+            {
                     GUILayout.Label("进入游戏后注入...", modifyisDisabled);
                 }
             }
