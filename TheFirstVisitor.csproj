@@ -50,6 +50,14 @@
       <HintPath>G:\ACG1.10.2\.RenGe\Game\Unity\Mono\初期の訪問者\初期の訪問者_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>G:\ACG1.10.2\.RenGe\Game\Unity\Mono\初期の訪問者\初期の訪問者_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>G:\ACG1.10.2\.RenGe\Game\Unity\Mono\初期の訪問者\初期の訪問者_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>G:\ACG1.10.2\.RenGe\Game\Unity\Mono\初期の訪問者\初期の訪問者_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>

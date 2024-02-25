@@ -1,15 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
-using Slate;
 using System.Reflection;
 
 namespace TheFirstVisitorMainPATH
@@ -21,7 +14,12 @@ namespace TheFirstVisitorMainPATH
         List<GameObject> allItems = new List<GameObject>();
 
         GameObject player;
-        GameObject tipText;
+        GameObject playerNewBody;
+
+        Avatar yurineAvatar;
+        Avatar zeroAvatar;
+
+        Scene sceneState;
 
         GUIStyle modifyisEnabled = new GUIStyle();
         GUIStyle modifyisDisabled = new GUIStyle();
@@ -40,12 +38,12 @@ namespace TheFirstVisitorMainPATH
         string _tipBtnText;
         string _tipText;
 
-
         string[] buffName = new string[] { "シールド", "淫乱", "エネルギー増強", "光学迷彩" };
         string[] buffName_ZH = new string[] { "护盾", "淫乱", "体力増強", "光学迷彩" };
         string[] windowSize = new string[] { "2560x1440", "1920x1080", "1600x900", "1280x720", "800x600"};
 
         bool isOnGame;
+        bool bodyModify;
 
         bool runGetAllitems;
         bool teleportItems;
@@ -62,12 +60,16 @@ namespace TheFirstVisitorMainPATH
 
         bool godMode;
 
+        /*          TmpVariable          */
+        bool _rotateMode;
+
         //热键
         public KeyCode openModifyMenuKey = KeyCode.F2;
         public KeyCode openChestKey = KeyCode.F3;       //聚怪
         public KeyCode surveyAllItemsKey = KeyCode.F4;        //获取所有物品
         public KeyCode pickupKey = KeyCode.F5;        //拾取
         public KeyCode godModeKey = KeyCode.F6;         //无敌
+        public KeyCode bodyModifyKey = KeyCode.F8;      //人物模型
         public KeyCode closeModifierKey = KeyCode.F9;     //关闭
 
         enum AllGameScene
@@ -81,6 +83,8 @@ namespace TheFirstVisitorMainPATH
 
         void Start()
         {
+            Application.targetFrameRate = 60;
+
             StartCoroutine(checkGameState());
 
             //菜单样式
@@ -159,11 +163,17 @@ namespace TheFirstVisitorMainPATH
             {
                 pickupAllItems = !pickupAllItems;
                 StartCoroutine(PickupItems_Ground());
-        }
+            }
 
             if (Input.GetKeyDown(closeModifierKey))
-        {
+            {
                 Destroy(this);
+            }
+
+            if (Input.GetKeyDown(bodyModifyKey))
+            {
+                bodyModify = !bodyModify;
+                ReplaceModel();
             }
 
             if (Input.GetKeyDown(godModeKey))
@@ -171,17 +181,115 @@ namespace TheFirstVisitorMainPATH
                 godMode = !godMode;
             }
             if (godMode && isOnGame && player != null)
-                {
+            {
                 YurineController playerController = player.GetComponentInChildren<YurineController>();
 
                 playerController.hp = playerController.maxHp;
                 playerController.stamina = playerController.maxStamina;
-                }
+            }
+        }
+
+        private void ReplaceModel()
+        {
+            if (sceneState.name == AllGameScene.BaseShip.ToString())
+            {
+                _tipText = "飞船上换不了捏";
+                hastipText = true;
+                return;
             }
 
+            GameObject newModel = GameObject.Find("Zero_ver1.01");
+            GameObject originModel = player.transform.Find("Yurine").gameObject;
+
+            if (yurineAvatar == null)
+            {
+                yurineAvatar = player.GetComponent<Animator>().avatar;
+                zeroAvatar = newModel.GetComponent<Animator>().avatar;
+            }
+            
+            if (player.transform.Find("Zero"))
+            {
+                if (bodyModify)
+                {
+                    player.GetComponent<Animator>().avatar = zeroAvatar;
+                    playerNewBody.GetComponent<Animator>().avatar = yurineAvatar;
+
+                    originModel.SetActive(false);
+                    playerNewBody.SetActive(true);
+
+                    Gun[] gun = originModel.GetComponentsInChildren<Gun>();
+                    
+                    Transform[] allBones = playerNewBody.GetComponentsInChildren<Transform>();
+
+                    if (gun.Length < 1)
+                        return;
+                    foreach (Transform obj in allBones)
+                    {
+                        if (obj.name == "Left wrist")
+                        {
+                            gun[0].transform.parent = obj.transform;
+                            gun[0].transform.localPosition = Vector3.zero;
+                            gun[0].transform.rotation = Quaternion.identity;
+                            gun[0].transform.localScale = new Vector3(0.008f, 0.008f, 0.008f);
+                        }
+                        else if (obj.name == "Right wrist")
+                        {
+                            gun[1].transform.parent = obj.transform;
+                            gun[1].transform.localPosition = Vector3.zero;
+                            gun[1].transform.rotation = Quaternion.identity;
+                            gun[1].transform.localScale = new Vector3(0.008f, 0.008f, 0.008f);
+                        }
+                    }
+                }
+                else
+                {
+                    playerNewBody.GetComponent<Animator>().avatar = zeroAvatar;
+                    player.GetComponent<Animator>().avatar = yurineAvatar;
+
+                    originModel.SetActive(true);
+                    playerNewBody.SetActive(false);
+
+
+                    Gun[] gun = playerNewBody.GetComponentsInChildren<Gun>();
+
+                    Transform[] allBones = originModel.GetComponentsInChildren<Transform>();
+
+                    if (gun.Length < 1)
+                        return;
+                    foreach (Transform obj in allBones)
+                    {
+                        if (obj.name == "Left wrist")
+                        {
+                            gun[0].transform.parent = obj.transform;
+                            gun[0].transform.localPosition = Vector3.zero;
+                            gun[0].transform.rotation = Quaternion.identity;
+                            gun[0].transform.localScale = new Vector3(0.0123f, 0.0123f, 0.0123f);
+                        }
+                        else if (obj.name == "Right wrist")
+                        {
+                            gun[1].transform.parent = obj.transform;
+                            gun[1].transform.localPosition = Vector3.zero;
+                            gun[1].transform.rotation = Quaternion.identity;
+                            gun[1].transform.localScale = new Vector3(0.0123f, 0.0123f, 0.0123f);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                playerNewBody = Instantiate(newModel, Vector3.zero, Quaternion.identity);
+                playerNewBody.name = "Zero";
+                playerNewBody.transform.parent = player.transform;
+                playerNewBody.transform.position = originModel.transform.position;
+                playerNewBody.transform.rotation = originModel.transform.rotation;
+                DontDestroyOnLoad(playerNewBody);
+            }
+
+
+        }
+
+
         //聚怪 Orc_
-
-
 
         IEnumerator ClearTipText()
         {
@@ -299,12 +407,18 @@ namespace TheFirstVisitorMainPATH
 
             while (true)
         {
-                Scene sceneState = SceneManager.GetActiveScene();
+                sceneState = SceneManager.GetActiveScene();
 
                 if (sceneState.name == AllGameScene.PreTitle.ToString() || sceneState.name == AllGameScene.Title.ToString())
-            {
+                {   
                     _tipBtnText = "等待进入游戏.....";
                     isOnGame = false;
+                }
+                else if (sceneState.name == AllGameScene.BaseShip.ToString())
+                {
+                    yurineAvatar = null;
+                    zeroAvatar = null;
+                    bodyModify = false;
                 }
                 else
                 {
@@ -507,6 +621,7 @@ namespace TheFirstVisitorMainPATH
                     GUILayout.Label("传送物资 [F4]", teleportItems ? modifyisEnabled : modifyisDisabled);
                     GUILayout.Label("一键拾取 [F5]", pickupAllItems ? modifyisEnabled : modifyisDisabled);
                     GUILayout.Label("人物无敌 [F6]", godMode ? modifyisEnabled : modifyisDisabled);
+                    GUILayout.Label("人物模型 [F8]", bodyModify ? modifyisEnabled : modifyisDisabled);
 
                     if (GUILayout.Button("添加经验") && !string.IsNullOrEmpty(addExp))
                     {
